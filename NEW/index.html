@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#667eea">
+    <title>IoD-GH Attendance App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #d9d8d8 0%, #fefefe 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .container {
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 30px 25px;
+            max-width: 500px;
+            width: 100%;
+            margin: auto;
+            position: relative;
+        }
+
+        .offline-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #ff6b6b;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: none;
+            z-index: 1000;
+            animation: pulse 2s infinite;
+        }
+
+        .offline-indicator.active {
+            display: block;
+        }
+
+        .online-indicator {
+            background: #51cf66;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .admin-link {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .admin-link:hover {
+            transform: scale(1.05);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            margin-top: 20px;
+        }
+
+        .app-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: #01146a;
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f9f9f9;
+            -webkit-appearance: none;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        button {
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            touch-action: manipulation;
+        }
+
+        .sign-in-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .sign-in-btn:active {
+            transform: scale(0.95);
+        }
+
+        .sign-out-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .sign-out-btn:active {
+            transform: scale(0.95);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .status-section {
+            margin-top: 25px;
+            padding: 18px;
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            border-radius: 15px;
+            display: none;
+        }
+
+        .status-section.active {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .status-title {
+            font-weight: 800;
+            color: #2d3436;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+
+        .status-info {
+            color: #2d3436;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .status-info strong {
+            color: #000;
+        }
+
+        .message {
+            padding: 14px;
+            border-radius: 12px;
+            margin-top: 18px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+            display: block;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+            display: block;
+        }
+
+        .message.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffeeba;
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 18px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-text {
+            color: #f5576c;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-text.active {
+            display: block;
+        }
+
+        .offline-queue {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff3cd;
+            border-radius: 12px;
+            display: none;
+        }
+
+        .offline-queue.active {
+            display: block;
+        }
+
+        .offline-queue-title {
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .offline-queue-item {
+            padding: 8px;
+            background: white;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        @media (max-width: 400px) {
+            .container {
+                padding: 25px 20px;
+            }
+            
+            h1 {
+                font-size: 22px;
+            }
+            
+            button {
+                font-size: 14px;
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-indicator" id="offlineIndicator">📡 Offline Mode</div>
+    
+    <div class="container">
+        <a href="admin.html" class="admin-link">👤 Admin</a>
+        
+        <div class="header">
+            <img src="IoD_Logo_png.png" alt="IoD Logo" style="width: 90px; height: auto; margin-bottom: 10px;">
+            <h1>INSTITUTE OF DIRECTORS-GH</h1>
+            <p class="subtitle">Please fill in your details.</p>
+        </div>
+
+        <form id="attendanceForm">
+            <div class="form-group">
+                <label for="name">Full Name </label>
+                <input type="text" id="name" required placeholder="Enter your full name" autocomplete="name">
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number </label>
+                <input type="tel" id="phone" required placeholder="0XXXXXXXXX" maxlength="10" pattern="[0-9]{10}" autocomplete="tel">
+                <span class="error-text" id="phoneError">Phone number must be exactly 10 digits</span>
+            </div>
+
+            <div class="form-group">
+                <label for="purpose">Purpose </label>
+                <select id="purpose" required>
+                    <option value="">Select purpose</option>
+                    <option value="Staff">Staff</option>
+                    <option value="Personal">Personal</option>
+                    <option value="Visitor">Visitor</option>
+                </select>
+            </div>
+
+            <div class="button-group">
+                <button type="button" class="sign-in-btn" id="signInBtn">Sign In</button>
+                <button type="button" class="sign-out-btn" id="signOutBtn">Sign Out</button>
+            </div>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+        </div>
+
+        <div class="message" id="message"></div>
+
+        <div class="offline-queue" id="offlineQueue">
+            <div class="offline-queue-title">📦 Pending Submissions (will sync when online)</div>
+            <div id="queueList"></div>
+        </div>
+
+        <div class="status-section" id="statusSection">
+            <div class="status-title">📊 Today's Status</div>
+            <div class="status-info" id="statusInfo"></div>
+        </div>
+    </div>
+
+    <script>
+        // REPLACE THIS WITH YOUR GOOGLE APPS SCRIPT WEB APP URL
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQv23KeBaqqPmUiyYZw_ThxN9H19DHzM6_17V095Pfz7Ej43-qypdpQuBsJjfo7_yy/exec';
+
+        const form = document.getElementById('attendanceForm');
+        const nameInput = document.getElementById('name');
+        const phoneInput = document.getElementById('phone');
+        const purposeSelect = document.getElementById('purpose');
+        const signInBtn = document.getElementById('signInBtn');
+        const signOutBtn = document.getElementById('signOutBtn');
+        const loading = document.getElementById('loading');
+        const message = document.getElementById('message');
+        const statusSection = document.getElementById('statusSection');
+        const statusInfo = document.getElementById('statusInfo');
+        const phoneError = document.getElementById('phoneError');
+        const offlineIndicator = document.getElementById('offlineIndicator');
+        const offlineQueue = document.getElementById('offlineQueue');
+        const queueList = document.getElementById('queueList');
+
+        let isOnline = navigator.onLine;
+        let pendingQueue = JSON.parse(localStorage.getItem('attendanceQueue') || '[]');
+
+        function updateOnlineStatus() {
+            isOnline = navigator.onLine;
+            if (isOnline) {
+                offlineIndicator.textContent = '✓ Online';
+                offlineIndicator.classList.add('online-indicator');
+                offlineIndicator.classList.add('active');
+                setTimeout(() => offlineIndicator.classList.remove('active'), 3000);
+                processPendingQueue();
+            } else {
+                offlineIndicator.textContent = '📡 Offline Mode';
+                offlineIndicator.classList.remove('online-indicator');
+                offlineIndicator.classList.add('active');
+            }
+            updateQueueDisplay();
+        }
+
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+
+        phoneInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            // Ensure it starts with 0
+            if (value.length > 0 && value[0] !== '0') {
+                value = '0' + value;
+            }
+            
+            // Limit to 10 digits
+            if (value.length > 10) {
+                value = value.substring(0, 10);
+            }
+            
+            e.target.value = value;
+            
+            if (value.length !== 10 && value.length > 0) {
+                phoneError.classList.add('active');
+            } else {
+                phoneError.classList.remove('active');
+            }
+        });
+
+        signInBtn.addEventListener('click', function() {
+            if (!validateForm()) return;
+
+            const data = {
+                action: 'signIn',
+                name: nameInput.value.trim(),
+                phone: phoneInput.value.trim(),
+                purpose: purposeSelect.value,
+                timestamp: new Date().toISOString()
+            };
+
+            submitData(data);
+        });
+
+        signOutBtn.addEventListener('click', function() {
+            if (!validateForm()) return;
+
+            if (!confirm('Are you sure you want to sign out?')) {
+                return;
+            }
+
+            const data = {
+                action: 'signOut',
+                name: nameInput.value.trim(),
+                phone: phoneInput.value.trim(),
+                purpose: purposeSelect.value,
+                timestamp: new Date().toISOString()
+            };
+
+            submitData(data);
+            
+            // Clear form and show session expired message after sign out
+            setTimeout(() => {
+                nameInput.value = '';
+                phoneInput.value = '';
+                purposeSelect.value = '';
+                statusSection.classList.remove('active');
+                showMessage('📋 Session ended. Scan again to log in again.', 'warning');
+            }, 2000);
+        });
+
+        function validateForm() {
+            if (!nameInput.value.trim()) {
+                showMessage('Please enter your name', 'error');
+                return false;
+            }
+
+            if (phoneInput.value.length !== 10) {
+                showMessage('Phone number must be exactly 10 digits', 'error');
+                return false;
+            }
+
+            if (phoneInput.value[0] !== '0') {
+                showMessage('Phone number must start with 0', 'error');
+                return false;
+            }
+
+            if (!purposeSelect.value) {
+                showMessage('Please select a purpose', 'error');
+                return false;
+            }
+
+            return true;
+        }
+
+        function submitData(data) {
+            if (!isOnline) {
+                pendingQueue.push(data);
+                localStorage.setItem('attendanceQueue', JSON.stringify(pendingQueue));
+                showMessage('📦 Saved offline. Will sync when online.', 'warning');
+                updateQueueDisplay();
+                updateStatus(data, data.action === 'signIn' ? 'in' : 'out');
+                return;
+            }
+
+            showLoading(true);
+            hideMessage();
+            
+            const params = new URLSearchParams(data).toString();
+            
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: params
+            })
+            .then(() => {
+                showLoading(false);
+                if (data.action === 'signIn') {
+                    showMessage('✓ Signed in successfully! You can only sign in once per day.', 'success');
+                    updateStatus(data, 'in');
+                } else {
+                    showMessage('✓ Signed out successfully!', 'success');
+                    updateStatus(data, 'out');
+                    // Close browser after successful sign out
+                    setTimeout(() => {
+                        window.close();
+                    }, 2000);
+                }
+            })
+            .catch(error => {
+                showLoading(false);
+                pendingQueue.push(data);
+                localStorage.setItem('attendanceQueue', JSON.stringify(pendingQueue));
+                showMessage('📦 Saved to queue. Will retry automatically.', 'warning');
+                updateQueueDisplay();
+            });
+        }
+
+        function processPendingQueue() {
+            if (pendingQueue.length === 0) return;
+
+            showMessage('🔄 Syncing ' + pendingQueue.length + ' pending records...', 'warning');
+
+            const promises = pendingQueue.map(data => {
+                const params = new URLSearchParams(data).toString();
+                return fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: params
+                });
+            });
+
+            Promise.allSettled(promises).then(() => {
+                pendingQueue = [];
+                localStorage.setItem('attendanceQueue', JSON.stringify(pendingQueue));
+                showMessage('✓ All records synced successfully!', 'success');
+                updateQueueDisplay();
+            });
+        }
+
+        function updateQueueDisplay() {
+            if (pendingQueue.length === 0) {
+                offlineQueue.classList.remove('active');
+            } else {
+                offlineQueue.classList.add('active');
+                queueList.innerHTML = pendingQueue.map((item, i) => 
+                    `<div class="offline-queue-item">${i+1}. ${item.action === 'signIn' ? '→' : '←'} ${item.name} (${item.phone})</div>`
+                ).join('');
+            }
+        }
+
+        function updateStatus(data, type) {
+            const now = new Date();
+            const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            
+            statusSection.classList.add('active');
+            
+            if (type === 'in') {
+                statusInfo.innerHTML = `
+                    <strong>Name:</strong> ${data.name}<br>
+                    <strong>Phone:</strong> ${data.phone}<br>
+                    <strong>Purpose:</strong> ${data.purpose}<br>
+                    <strong>Time In:</strong> ${time}<br>
+                    <strong>Status:</strong> <span style="color: #27ae60;">✓ Signed In</span>
+                `;
+            } else {
+                statusInfo.innerHTML = `
+                    <strong>Name:</strong> ${data.name}<br>
+                    <strong>Phone:</strong> ${data.phone}<br>
+                    <strong>Purpose:</strong> ${data.purpose}<br>
+                    <strong>Time Out:</strong> ${time}<br>
+                    <strong>Status:</strong> <span style="color: #e74c3c;">✓ Signed Out</span>
+                `;
+            }
+        }
+
+        function showLoading(show) {
+            if (show) {
+                loading.classList.add('active');
+                signInBtn.disabled = true;
+                signOutBtn.disabled = true;
+            } else {
+                loading.classList.remove('active');
+                signInBtn.disabled = false;
+                signOutBtn.disabled = false;
+            }
+        }
+
+        function showMessage(text, type) {
+            message.textContent = text;
+            message.className = 'message ' + type;
+            
+            setTimeout(() => {
+                hideMessage();
+            }, 5000);
+        }
+
+        function hideMessage() {
+            message.className = 'message';
+        }
+
+        updateOnlineStatus();
+        updateQueueDisplay();
+    </script>
+</body>
+</html>
