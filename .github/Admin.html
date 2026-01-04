@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#667eea">
+    <title>Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .login-screen {
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: rgb(244, 244, 244);
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px 30px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: #001570;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .lock-icon {
+            font-size: 60px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .login-container h1 {
+            color: #01177a;
+            font-size: 26px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #495fbe 0%, #280050 100%);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1d2b66 0%, #3c0e6a 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-white {
+            background: white;
+            color: #667eea;
+        }
+
+        .btn-danger {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .stat-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+        }
+
+        select, input[type="date"] {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 20px;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f8f9fa;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 15px;
+            border-top: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-out {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+        }
+
+        .btn-edit {
+            background: #667eea;
+            color: white;
+            margin-right: 5px;
+        }
+
+        .btn-delete {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .message {
+            padding: 14px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+
+        .default-creds {
+            margin-top: 25px;
+            padding: 15px;
+            background: #e7f3ff;
+            border-radius: 12px;
+            font-size: 13px;
+            color: #004085;
+        }
+
+        .default-creds code {
+            background: #cce5ff;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            font-size: 20px;
+            color: #333;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+            line-height: 1;
+        }
+
+        .staff-report-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .staff-report-item h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .staff-report-item p {
+            color: #666;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+
+        .attendance-list {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        .attendance-list li {
+            font-size: 13px;
+            color: #666;
+            margin: 3px 0;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+            }
+
+            .header {
+                padding: 15px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header h1 {
+                font-size: 20px;
+                margin-bottom: 15px;
+            }
+
+            .header-actions {
+                width: 100%;
+                gap: 8px;
+            }
+
+            .btn {
+                padding: 8px 12px;
+                font-size: 12px;
+                flex: 1;
+                min-width: 70px;
+                text-align: center;
+            }
+
+            .container {
+                padding: 15px 10px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 12px;
+                margin-bottom: 20px;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-icon {
+                font-size: 28px;
+                margin-bottom: 8px;
+            }
+
+            .stat-value {
+                font-size: 24px;
+            }
+
+            .stat-label {
+                font-size: 12px;
+            }
+
+            .controls {
+                flex-direction: column;
+                padding: 15px;
+                gap: 10px;
+            }
+
+            .search-box {
+                min-width: 100%;
+            }
+
+            .search-box input,
+            select,
+            input[type="date"] {
+                padding: 10px 12px;
+                font-size: 14px;
+                width: 100%;
+            }
+
+            .table-container {
+                overflow-x: auto;
+                border-radius: 10px;
+            }
+
+            .table-header {
+                padding: 15px;
+                flex-direction: column;
+            }
+
+            table {
+                font-size: 12px;
+                min-width: 600px;
+            }
+
+            th {
+                padding: 10px;
+                font-size: 11px;
+            }
+
+            td {
+                padding: 10px;
+                font-size: 12px;
+            }
+
+            .btn-sm {
+                padding: 5px 8px;
+                font-size: 10px;
+                white-space: nowrap;
+            }
+
+            .modal-content {
+                padding: 20px;
+                max-height: 85vh;
+            }
+
+            .modal-header h3 {
+                font-size: 18px;
+            }
+
+            .staff-report-item {
+                padding: 12px;
+                margin-bottom: 12px;
+            }
+
+            .staff-report-item h4 {
+                font-size: 14px;
+                margin-bottom: 8px;
+            }
+
+            .staff-report-item p {
+                font-size: 13px;
+            }
+
+            .attendance-list li {
+                font-size: 12px;
+                margin: 2px 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 18px;
+                margin-bottom: 12px;
+            }
+
+            .header-actions {
+                gap: 5px;
+            }
+
+            .btn {
+                padding: 6px 8px;
+                font-size: 11px;
+                min-width: 50px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .stat-card {
+                padding: 12px;
+            }
+
+            .stat-icon {
+                font-size: 24px;
+                margin-bottom: 6px;
+            }
+
+            .stat-value {
+                font-size: 20px;
+            }
+
+            .stat-label {
+                font-size: 11px;
+            }
+
+            .controls {
+                padding: 12px;
+                gap: 8px;
+            }
+
+            .search-box input,
+            select,
+            input[type="date"] {
+                padding: 8px 10px;
+                font-size: 13px;
+            }
+
+            table {
+                font-size: 11px;
+                min-width: 500px;
+            }
+
+            th {
+                padding: 8px;
+                font-size: 10px;
+            }
+
+            td {
+                padding: 8px;
+                font-size: 11px;
+            }
+
+            .btn-sm {
+                padding: 4px 6px;
+                font-size: 9px;
+            }
+
+            .status-badge {
+                padding: 3px 8px;
+                font-size: 10px;
+            }
+
+            .modal-content {
+                padding: 15px;
+                border-radius: 10px;
+            }
+
+            .default-creds {
+                font-size: 12px;
+                padding: 12px;
+            }
+
+            .default-creds code {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-container">
+            <a href="index.html" class="back-link">← Back to Attendance</a>
+            <div class="lock-icon">🔐</div>
+            <h1>Admin Login</h1>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="login-btn">Login</button>
+            </form>
+            
+            <div class="message" id="loginMessage"></div>
+            
+            <div class="default-creds">
+                <strong>Default Credentials:</strong><br>
+                Username: <code>admin</code><br>
+                Password: <code>admin00</code>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard">
+        <div class="header">
+            <div class="header-content">
+                <h1>📊 Admin Dashboard</h1>
+                <div class="header-actions">
+                    <button class="btn btn-white" id="refreshBtn">🔄 Refresh</button>
+                    <button class="btn btn-white" id="exportBtn">📥 Export CSV</button>
+                    <a href="index.html" class="btn btn-white">← Back to App</a>
+                    <button class="btn btn-danger" id="logoutBtn">Logout</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-value" id="totalToday">0</div>
+                    <div class="stat-label">Total Today</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-value" id="signedIn">0</div>
+                    <div class="stat-label">Currently Signed In</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">👔</div>
+                    <div class="stat-value" id="staffCount">0</div>
+                    <div class="stat-label">Staff</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">👤</div>
+                    <div class="stat-value" id="personalCount">0</div>
+                    <div class="stat-label">Personal</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🚶</div>
+                    <div class="stat-value" id="visitorCount">0</div>
+                    <div class="stat-label">Visitors</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search by name or phone...">
+                </div>
+                <input type="date" id="dateFilter">
+                <select id="purposeFilter">
+                    <option value="">All Purposes</option>
+                    <option value="Staff">Staff</option>
+                    <option value="Personal">Personal</option>
+                    <option value="Visitor">Visitor</option>
+                </select>
+                <select id="statusFilter">
+                    <option value="">All Status</option>
+                    <option value="active">Currently Signed In</option>
+                    <option value="completed">Signed Out</option>
+                </select>
+                <button class="btn btn-white" id="monthlyReportBtn">📊 Monthly Staff Report</button>
+            </div>
+
+            <div class="message" id="dashboardMessage"></div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <h2 style="display: flex; align-items: center; gap: 10px;">
+                        Attendance Records
+                        <button class="btn btn-white" id="toggleViewBtn" style="padding: 5px 10px; font-size: 11px; margin: 0;">📅 All Records</button>
+                    </h2>
+                    <span id="recordCount">0 records</span>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Purpose</th>
+                                <th>Time In</th>
+                                <th>Time Out</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <tr>
+                                <td colspan="7" class="loading">Loading data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Report Modal -->
+    <div class="modal" id="reportModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📊 Monthly Staff Attendance Report</h3>
+                <button class="close-btn" id="closeReportModal">&times;</button>
+            </div>
+            <div id="reportContent">
+                <p class="loading">Generating report...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // REPLACE THIS WITH YOUR GOOGLE APPS SCRIPT WEB APP URL
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQv23KeBaqqPmUiyYZw_ThxN9H19DHzM6_17V095Pfz7Ej43-qypdpQuBsJjfo7_yy/exec';
+        
+        const ADMIN_USERNAME = 'admin';
+        const ADMIN_PASSWORD = 'admin00';
+
+        let attendanceData = [];
+        let filteredData = [];
+        let showingAllRecords = false;
+
+        // Login handling
+        const loginForm = document.getElementById('loginForm');
+        const loginScreen = document.getElementById('loginScreen');
+        const dashboard = document.getElementById('dashboard');
+        const loginMessage = document.getElementById('loginMessage');
+
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                localStorage.setItem('adminLoggedIn', 'true');
+                showDashboard();
+            } else {
+                showLoginMessage('Invalid username or password', 'error');
+            }
+        });
+
+        function showDashboard() {
+            loginScreen.style.display = 'none';
+            dashboard.classList.add('active');
+            loadData();
+        }
+
+        function showLoginMessage(text, type) {
+            loginMessage.textContent = text;
+            loginMessage.className = 'message ' + type;
+            setTimeout(() => {
+                loginMessage.className = 'message';
+            }, 3000);
+        }
+
+        // Check if already logged in
+        if (localStorage.getItem('adminLoggedIn') === 'true') {
+            showDashboard();
+        }
+
+        // Dashboard functionality
+        const dateFilter = document.getElementById('dateFilter');
+        // Set to today's date in YYYY-MM-DD format
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        dateFilter.value = `${year}-${month}-${day}`;
+
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('adminLoggedIn');
+                location.reload();
+            }
+        });
+
+        async function loadData() {
+            document.getElementById('tableBody').innerHTML = '<tr><td colspan="8" class="loading">Loading data from Google Sheets...</td></tr>';
+            
+            try {
+                const response = await fetch(SCRIPT_URL + '?action=getAll');
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    attendanceData = data.data;
+                    updateStats();
+                    filterData(); // Apply filters to show today only by default
+                } else {
+                    showDashboardMessage('Error loading data', 'error');
+                }
+            } catch (error) {
+                showDashboardMessage('Error: Could not connect to server', 'error');
+            }
+        }
+
+        function updateStats() {
+            // Use GMT time for today's date
+            const today = new Date().toISOString().split('T')[0];
+            const todayRecords = attendanceData.filter(r => r.date === today);
+            
+            document.getElementById('totalToday').textContent = todayRecords.length;
+            document.getElementById('signedIn').textContent = todayRecords.filter(r => !r.timeOut).length;
+            document.getElementById('staffCount').textContent = todayRecords.filter(r => r.purpose === 'Staff').length;
+            document.getElementById('personalCount').textContent = todayRecords.filter(r => r.purpose === 'Personal').length;
+            document.getElementById('visitorCount').textContent = todayRecords.filter(r => r.purpose === 'Visitor').length;
+        }
+
+        function extractTime(timestamp) {
+            // Extract and convert time to 12-hour format with AM/PM including seconds
+            if (!timestamp) return '-';
+            
+            // Extract time portion (HH:MM:SS or HH:MM)
+            const timeMatch = timestamp.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+            if (!timeMatch) return timestamp;
+            
+            let hours = parseInt(timeMatch[1]);
+            const minutes = timeMatch[2];
+            const seconds = timeMatch[3] || '00'; // Default to 00 if seconds not provided
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            
+            // Convert to 12-hour format
+            hours = hours % 12;
+            hours = hours ? hours : 12; // 0 becomes 12
+            
+            return `${hours}:${minutes}:${seconds} ${ampm}`;
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            
+            if (filteredData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px;">No records found</td></tr>';
+                document.getElementById('recordCount').textContent = '0 records';
+                return;
+            }
+
+            tbody.innerHTML = filteredData.map(record => `
+                <tr>
+                    <td>${record.date}</td>
+                    <td>${record.name}</td>
+                    <td>${record.phone}</td>
+                    <td>${record.purpose}</td>
+                    <td>${extractTime(record.timeIn)}</td>
+                    <td>${record.timeOut ? extractTime(record.timeOut) : '-'}</td>
+                    <td><span class="status-badge ${record.timeOut ? 'status-out' : 'status-active'}">${record.timeOut ? '✓ Signed Out' : '⏰ Active'}</span></td>
+                    <td>
+                        ${!record.timeOut ? `<button class="btn btn-sm" style="background: #51cf66; color: white;" onclick="signOutRecord('${record.phone}', '${record.date}')">Sign Out</button>` : '-'}
+                    </td>
+                </tr>
+            `).join('');
+
+            document.getElementById('recordCount').textContent = `${filteredData.length} record${filteredData.length !== 1 ? 's' : ''}`;
+        }
+
+        function filterData() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const selectedDate = dateFilter.value;
+            const selectedPurpose = document.getElementById('purposeFilter').value;
+            const selectedStatus = document.getElementById('statusFilter').value;
+
+            filteredData = attendanceData.filter(record => {
+                const matchSearch = record.name.toLowerCase().includes(searchTerm) || record.phone.includes(searchTerm);
+                
+                // If showing all records, use the selected date filter (or no filter if empty)
+                // If showing today only, always use today's date
+                let matchDate;
+                if (showingAllRecords) {
+                    // When showing all records, respect the date filter (empty = all dates)
+                    matchDate = !selectedDate || record.date === selectedDate;
+                } else {
+                    // When showing today only, use today's date
+                    const today = new Date().toISOString().split('T')[0];
+                    matchDate = record.date === today;
+                }
+                
+                const matchPurpose = !selectedPurpose || record.purpose === selectedPurpose;
+                const matchStatus = !selectedStatus || (selectedStatus === 'active' && !record.timeOut) || (selectedStatus === 'completed' && record.timeOut);
+                return matchSearch && matchDate && matchPurpose && matchStatus;
+            });
+
+            renderTable();
+        }
+
+        function showDashboardMessage(text, type) {
+            const msg = document.getElementById('dashboardMessage');
+            msg.textContent = text;
+            msg.className = 'message ' + type;
+            setTimeout(() => {
+                msg.className = 'message';
+            }, 5000);
+        }
+
+        document.getElementById('searchInput').addEventListener('input', filterData);
+        dateFilter.addEventListener('change', filterData);
+        document.getElementById('purposeFilter').addEventListener('change', filterData);
+        document.getElementById('statusFilter').addEventListener('change', filterData);
+        document.getElementById('refreshBtn').addEventListener('click', loadData);
+
+        // Toggle between today's records and all records
+        document.getElementById('toggleViewBtn').addEventListener('click', function() {
+            showingAllRecords = !showingAllRecords;
+            const btn = document.getElementById('toggleViewBtn');
+            
+            if (showingAllRecords) {
+                // Showing all records mode - enable date filter
+                btn.textContent = '📅 Today Only';
+                dateFilter.disabled = false;
+                dateFilter.style.opacity = '1';
+                dateFilter.value = ''; // Empty to show all records
+                filterData();
+            } else {
+                // Showing today only mode - disable date filter
+                btn.textContent = '📅 All Records';
+                dateFilter.disabled = true;
+                dateFilter.style.opacity = '0.5';
+                // Reset to today's date
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const day = String(today.getDate()).padStart(2, '0');
+                dateFilter.value = `${year}-${month}-${day}`;
+                filterData();
+            }
+        });
+
+        document.getElementById('exportBtn').addEventListener('click', function() {
+            const csv = [
+                ['Date', 'Name', 'Phone', 'Purpose', 'Time In', 'Time Out'],
+                ...filteredData.map(r => [r.date, r.name, r.phone, r.purpose, r.timeIn, r.timeOut || ''])
+            ].map(row => row.join(',')).join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `attendance_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        });
+
+        // Monthly Report Button
+        document.getElementById('monthlyReportBtn').addEventListener('click', function() {
+            generateMonthlyReport();
+        });
+
+        async function signOutRecord(phone, date) {
+            // Get current time in HH:MM:SS format
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const timeOut = `${hours}:${minutes}:${seconds}`;
+
+            if (confirm(`Sign out ${phone} at ${timeOut}?`)) {
+                try {
+                    const params = new URLSearchParams({
+                        action: 'signOut',
+                        phone: phone,
+                        date: date,
+                        timeOut: timeOut
+                    });
+
+                    const response = await fetch(SCRIPT_URL + '?' + params.toString());
+                    const text = await response.text();
+                    
+                    // Try to parse as JSON, if it fails, show the response text
+                    let result;
+                    try {
+                        result = JSON.parse(text);
+                    } catch (e) {
+                        // If not valid JSON, assume it failed
+                        showDashboardMessage('Google Apps Script error: ' + text, 'error');
+                        return;
+                    }
+                    
+                    if (result.status === 'success') {
+                        showDashboardMessage('Successfully signed out!', 'success');
+                        loadData(); // Refresh the table
+                    } else {
+                        showDashboardMessage('Error signing out: ' + (result.message || 'Unknown error'), 'error');
+                    }
+                } catch (error) {
+                    showDashboardMessage('Error: Could not sign out - ' + error.message, 'error');
+                }
+            }
+        }
+
+        // Monthly Report Button
+        document.getElementById('monthlyReportBtn').addEventListener('click', function() {
+            generateMonthlyReport();
+        });
+
+        document.getElementById('closeReportModal').addEventListener('click', function() {
+            document.getElementById('reportModal').classList.remove('active');
+        });
+
+        function formatDateForReport(dateStr) {
+            // Convert YYYY-MM-DD to a readable format like "January 3, 2026"
+            const date = new Date(dateStr + 'T00:00:00Z'); // Add time to avoid timezone issues
+            return date.toLocaleDateString('default', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        function generateMonthlyReport() {
+            const modal = document.getElementById('reportModal');
+            const reportContent = document.getElementById('reportContent');
+            
+            modal.classList.add('active');
+            reportContent.innerHTML = '<p class="loading">Generating report...</p>';
+
+            // Get current month and year (using the format from the data)
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const currentMonth = `${year}-${month}`; // YYYY-MM format
+            
+            // Filter staff records for current month
+            const monthlyStaffRecords = attendanceData.filter(r => 
+                r.date.startsWith(currentMonth) && r.purpose === 'Staff'
+            );
+
+            // Group by staff member (using phone as unique identifier)
+            const staffAttendance = {};
+            monthlyStaffRecords.forEach(record => {
+                const key = record.phone;
+                if (!staffAttendance[key]) {
+                    staffAttendance[key] = {
+                        name: record.name,
+                        phone: record.phone,
+                        daysPresent: new Set() // Use Set to count unique days
+                    };
+                }
+                staffAttendance[key].daysPresent.add(record.date);
+            });
+
+            // Generate HTML report with statistics
+            let html = `<h4 style="margin-bottom: 20px;">Staff Attendance Report - ${now.toLocaleString('default', { month: 'long', year: 'numeric' })}</h4>`;
+            
+            if (Object.keys(staffAttendance).length === 0) {
+                html += '<p>No staff attendance records found for this month.</p>';
+            } else {
+                // Create an array and sort by phone
+                const staffArray = Object.values(staffAttendance).sort((a, b) => a.phone.localeCompare(b.phone));
+                
+                html += `
+                    <div style="margin-bottom: 20px; overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                            <thead style="background: #f0f0f0;">
+                                <tr style="border-bottom: 2px solid #667eea;">
+                                    <th style="padding: 10px; text-align: left; font-weight: 600;">Name</th>
+                                    <th style="padding: 10px; text-align: left; font-weight: 600;">Phone</th>
+                                    <th style="padding: 10px; text-align: center; font-weight: 600;">Days Present</th>
+                                    <th style="padding: 10px; text-align: center; font-weight: 600;">Attendance %</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                staffArray.forEach(staff => {
+                    const daysPresent = staff.daysPresent.size;
+                    const totalDays = 30;
+                    const percentage = Math.round((daysPresent / totalDays) * 100);
+                    
+                    let rowColor = '';
+                    if (percentage >= 80) rowColor = '#d4edda'; // Green for good attendance
+                    else if (percentage >= 60) rowColor = '#fff3cd'; // Yellow for fair
+                    else rowColor = '#f8d7da'; // Red for poor
+                    
+                    html += `
+                        <tr style="border-bottom: 1px solid #e0e0e0; background: ${rowColor};">
+                            <td style="padding: 10px;">${staff.name}</td>
+                            <td style="padding: 10px;">${staff.phone}</td>
+                            <td style="padding: 10px; text-align: center; font-weight: 600;">${daysPresent}/${totalDays}</td>
+                            <td style="padding: 10px; text-align: center; font-weight: 600;">${percentage}%</td>
+                        </tr>
+                    `;
+                });
+                
+                html += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            reportContent.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
